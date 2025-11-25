@@ -9,7 +9,7 @@ export default async function Cars() {
 
   return (
     <div>
-      <h1>Here are all cars</h1>
+      <h1>Here are all-cars</h1>
 
       <ul>
         {cars.map((car) => (
