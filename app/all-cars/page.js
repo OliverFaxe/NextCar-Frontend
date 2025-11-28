@@ -1,63 +1,29 @@
-import Link from "next/link";
+import CarCard from "../components/Car";
 
-export default async function Cars() {
+export default async function CarsPage() {
   const response = await fetch("http://localhost:8080/cars", {
-    cache: "no-store", // så du alltid får senaste datan
+    cache: "no-store",
   });
 
   const cars = await response.json();
 
   return (
-    <div>
-      <h1>Here are all-cars</h1>
-
-      <ul>
+    <>
+    <section className="page-header">
+        <div className="container">
+            <h1>Våra Bilar</h1>
+            <p className="subtitle">Utforska vårt fullständiga utbud av välskötta fordon</p>
+        </div>
+    </section>
+    <section className="cars-section">
+    <div className="container">
+      <div className="row g-4">
         {cars.map((car) => (
-          <div className="car-card-grid" key={car.id}>
-            <div className="car-img-section">
-              <img
-                src={`/images/${car.imageUrl}`}
-                alt="${car.brand} ${car.model}"
-                className="img-fluid"
-              />
-            </div>
-            <div className="car-info">
-              <div className="car-header">
-                <h3>
-                  ${car.brand} ${car.model}
-                </h3>
-              </div>
-              <div className="car-meta">
-                <span className="badge">${car.category.name}</span>
-                <i className="bi bi-calendar3"></i> ${car.year}
-              </div>
-              <div className="car-specs">
-                <span className="car-spec-item">
-                  <i className="bi bi-fuel-pump"></i> ${car.fuel}
-                </span>
-                <span className="car-spec-item">
-                  <i className="bi bi-gear"></i> ${car.transmission}
-                </span>
-                <span className="car-spec-item">
-                  <i className="bi bi-people"></i> ${car.seats} sits
-                </span>
-              </div>
-              <div className="car-footer">
-                <div className="price-info-simple">
-                  <div className="price-display">
-                    <span className="price-per-day-large">
-                      ${car.price} kr / dag
-                    </span>
-                  </div>
-                  <Link href="/" className="btn-book-now">
-                    Välj datum & Boka
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </div>
+          <CarCard key={car.id ?? car._id} car={car} />
         ))}
-      </ul>
+      </div>
     </div>
+  </section>
+    </>
   );
 }

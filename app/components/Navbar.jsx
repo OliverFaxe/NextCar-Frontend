@@ -1,10 +1,11 @@
+"use client";
 import Link from "next/link";
-import "bootstrap/dist/css/bootstrap.min.css";
-import "bootstrap-icons/font/bootstrap-icons.css";
+import AuthButtons from "./AuthButtons";
+import "bootstrap/dist/js/bootstrap.bundle.min.js";
 
 export default function Navbar() {
   return (
-    <div>
+    <>
       <nav className="navbar navbar-expand-lg navbar-custom">
         <div className="container">
           <Link className="navbar-brand" href="/">
@@ -55,6 +56,6 @@ export default function Navbar() {
           </div>
         </div>
       </nav>
-    </div>
+    </>
   );
 }
