@@ -1,44 +1,47 @@
 "use client";
-import { useState, useEffect } from "react";
-import { isAuthenticated, getUserRole, logout } from "../utils/auth";
+
+import Link from "next/link";
+import { useAuth } from "../context/AuthContext";
 
 export default function AuthButtons() {
-  const [auth, setAuth] = useState({ loggedIn: false, firstName: "", role: "" });
+  const { user, loading, logout } = useAuth();
 
-  useEffect(() => {
-    if (isAuthenticated()) {
-      let firstName = localStorage.getItem("firstName") || sessionStorage.getItem("firstName");
-      const role = getUserRole();
-      if (role === "ADMIN") firstName = "Admin";
-      setAuth({ loggedIn: true, firstName, role });
-    } else {
-      setAuth({ loggedIn: false, firstName: "", role: "" });
-    }
-  }, []);
-
-  if (auth.loggedIn) {
+  if (loading) {
     return (
-      <>
-        <a href={auth.role === "ADMIN" ? "/admin/dashboard" : "/profile"} className="btn-profile">
-          <i className="bi bi-person-circle"></i> {auth.firstName || "Profil"}
-        </a>
-        <button
-          className="btn-logout"
-          style={{ marginLeft: "10px" }}
-          onClick={() => logout()}
-        >
-          <i className="bi bi-box-arrow-right"></i> Logga ut
-        </button>
-      </>
+      <span className="text-white-50 small" aria-live="polite">
+        Kontrollerar...
+      </span>
     );
-  } else {
+  }
+
+  if (!user) {
     return (
       <>
-        <a href="/register" className="btn-register">Registrera</a>
-        <a href="/login" className="btn-login-red">
+        <Link href="/register" className="btn-register">
+          Registrera
+        </Link>
+        <Link href="/login" className="btn-login-red">
           <i className="bi bi-box-arrow-in-right"></i> Logga in
-        </a>
+        </Link>
       </>
     );
   }
+
+  const profileHref = user.role === "ADMIN" ? "/admin/dashboard" : "/profile";
+  const displayName = user.firstName || (user.role === "ADMIN" ? "Admin" : "Profil");
+
+  return (
+    <>
+      <Link href={profileHref} className="btn-profile">
+        <i className="bi bi-person-circle"></i> {displayName}
+      </Link>
+      <button
+        className="btn-logout ms-2"
+        type="button"
+        onClick={logout}
+      >
+        <i className="bi bi-box-arrow-right"></i> Logga ut
+      </button>
+    </>
+  );
 }

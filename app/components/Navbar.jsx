@@ -1,9 +1,14 @@
 "use client";
+
+import { useEffect } from "react";
 import Link from "next/link";
 import AuthButtons from "./AuthButtons";
-import "bootstrap/dist/js/bootstrap.bundle.min.js";
 
 export default function Navbar() {
+  useEffect(() => {
+    import("bootstrap/dist/js/bootstrap.bundle.min.js");
+  }, []);
+
   return (
     <>
       <nav className="navbar navbar-expand-lg navbar-custom">
@@ -53,6 +58,7 @@ export default function Navbar() {
 
               <li className="nav-item ms-3" id="authButtons"></li>
             </ul>
+            <AuthButtons />
           </div>
         </div>
       </nav>
