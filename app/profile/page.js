@@ -147,7 +147,7 @@ export default function ProfilePage() {
                     <i className="bi bi-person"></i> Min profil
                   </li>
                   <li className="list-group-item">
-                    <Link href="/booking" className="text-decoration-none">
+                    <Link href="/my-bookings" className="text-decoration-none">
                       <i className="bi bi-calendar-check"></i> Mina bokningar
                     </Link>
                   </li>
