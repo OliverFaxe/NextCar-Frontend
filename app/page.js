@@ -165,17 +165,9 @@ export default function Home() {
     setSearchError("");
     setSearching(true);
     try {
-      //const sortParam = sortOrder === "price-desc" ? "desc" : "asc";
+      const sortParam = sortOrder === "price-desc" ? "desc" : "asc";
       const response = await fetch(
-        `${API_BASE_URL}/rentals {
-        METHOD : "POST",
-        BODY : {
-        carId: car.id,
-        startDate: startDate,
-        endDate: endDate,
-        customerEmail: customerEmail,
-        token: token,
-        }}`
+        `${API_BASE_URL}/cars/available?startDate=${startDate}&endDate=${endDate}&sort=${sortParam}`
       );
       if (!response.ok) {
         throw new Error("Kunde inte hämta tillgängliga bilar.");
@@ -381,7 +373,7 @@ export default function Home() {
                                 <div className="price-right">
                                   <Link
                                     className="btn-book-now"
-                                    href={`/booking?carId=${car.id}&startDate=${startDate}&endDate=${endDate}`}
+                                    href={`/booking-confirmation?carId=${car.id}&startDate=${startDate}&endDate=${endDate}`}
                                   >
                                     Boka nu
                                   </Link>
