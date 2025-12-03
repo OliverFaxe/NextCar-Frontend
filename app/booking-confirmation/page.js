@@ -55,17 +55,23 @@ function BookingConfirmationContent() {
   const [loadingCar, setLoadingCar] = useState(false);
   const [loadingCustomer, setLoadingCustomer] = useState(false);
 
+  // Check auth status FIRST - redirect before rendering anything
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    const storedStart = window.sessionStorage.getItem("startDate") ?? "";
-    const storedEnd = window.sessionStorage.getItem("endDate") ?? "";
-    setStartDate(startDateParam || storedStart || "");
-    setEndDate(endDateParam || storedEnd || "");
-  }, [startDateParam, endDateParam]);
+    if (loading) return; // Wait for auth check to complete
 
-  useEffect(() => {
-    if (loading) return;
     if (!user?.token) {
+      // Save pending booking to sessionStorage
+      const pendingBooking = {
+        carId,
+        startDate: startDateParam,
+        endDate: endDateParam,
+      };
+      window.sessionStorage.setItem(
+        "pendingBooking",
+        JSON.stringify(pendingBooking)
+      );
+
+      // Redirect immediately - don't show the modal
       const searchQuery = new URLSearchParams();
       if (carId) searchQuery.set("carId", carId);
       if (startDateParam) searchQuery.set("startDate", startDateParam);
@@ -73,9 +79,38 @@ function BookingConfirmationContent() {
       const redirectTarget = searchQuery.toString()
         ? `/booking-confirmation?${searchQuery.toString()}`
         : "/booking-confirmation";
-      router.replace(`/login?redirect=${encodeURIComponent(redirectTarget)}`);
+      router.push(`/login?redirect=${encodeURIComponent(redirectTarget)}`);
+      return;
     }
-  }, [carId, endDateParam, loading, router, startDateParam, user]);
+
+    // User is logged in, clear pending booking
+    window.sessionStorage.removeItem("pendingBooking");
+  }, [loading, user?.token, carId, startDateParam, endDateParam, router]);
+
+  // Show loading state while checking auth
+  if (loading) {
+    return (
+      <section className="booking-section py-5">
+        <div className="container text-center">
+          <div className="spinner-border text-primary" role="status" />
+          <p className="mt-3 text-muted">Kontrollerar din inloggning...</p>
+        </div>
+      </section>
+    );
+  }
+
+  // If not logged in, this won't render (redirect happens above)
+  if (!user?.token) {
+    return null;
+  }
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const storedStart = window.sessionStorage.getItem("startDate") ?? "";
+    const storedEnd = window.sessionStorage.getItem("endDate") ?? "";
+    setStartDate(startDateParam || storedStart || "");
+    setEndDate(endDateParam || storedEnd || "");
+  }, [startDateParam, endDateParam]);
 
   useEffect(() => {
     if (!carId) {

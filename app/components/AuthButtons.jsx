@@ -17,10 +17,10 @@ export default function AuthButtons() {
   if (!user) {
     return (
       <>
-        <Link href="/register" className="btn-register">
+        <Link href="/register" className="btn-register text-decoration-none">
           Registrera
         </Link>
-        <Link href="/login" className="btn-login-red">
+        <Link href="/login" className="btn-login-red text-decoration-none">
           <i className="bi bi-box-arrow-in-right"></i> Logga in
         </Link>
       </>
@@ -32,11 +32,11 @@ export default function AuthButtons() {
 
   return (
     <>
-      <Link href={profileHref} className="btn-profile">
+      <Link href={profileHref} className="btn-register text-decoration-none">
         <i className="bi bi-person-circle"></i> {displayName}
       </Link>
       <button
-        className="btn-logout ms-2"
+        className="btn-login-red"
         type="button"
         onClick={logout}
       >
