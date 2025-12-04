@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Cars from "./components/Cars";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
@@ -62,6 +62,8 @@ export default function Home() {
   const [searchError, setSearchError] = useState("");
   const [sortOrder, setSortOrder] = useState("price-asc");
 
+  const carsSectionRef = useRef(null);
+
   const minEndDate = startDate || todayISO;
   const maxEndDate = addDays(startDate || todayISO, 14);
 
@@ -89,8 +91,6 @@ export default function Home() {
     if (typeof window === "undefined") return;
     if (startDate) {
       window.sessionStorage.setItem("startDate", startDate);
-    } else {
-      window.sessionStorage.removeItem("startDate");
     }
   }, [startDate]);
 
@@ -98,8 +98,6 @@ export default function Home() {
     if (typeof window === "undefined") return;
     if (endDate) {
       window.sessionStorage.setItem("endDate", endDate);
-    } else {
-      window.sessionStorage.removeItem("endDate");
     }
   }, [endDate]);
 
@@ -177,6 +175,14 @@ export default function Home() {
       setAvailableCars(sorted);
       setHasSearched(true);
       setDaysCount(calculateDays(startDate, endDate));
+
+      // Smooth scroll to cars section after a brief delay
+      setTimeout(() => {
+        carsSectionRef.current?.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }, 300);
     } catch (error) {
       console.error("Search error:", error);
       setSearchError(
@@ -255,7 +261,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="cars-section">
+      <section className="cars-section" ref={carsSectionRef}>
         <div className="container">
           <div className="section-header">
             <h2 id="sectionTitle">
