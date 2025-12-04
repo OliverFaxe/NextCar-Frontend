@@ -1,49 +1,60 @@
 "use client";
+
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "../context/AuthContext";
+
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
 
 export default function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const router = useRouter();
+  const { login } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
 
-    // Example validation
     if (!email || !password) {
       setError("Fyll i alla fält");
       return;
     }
 
-    const loginData = { email: email.trim(), password };
-
+    setSubmitting(true);
     try {
-      const res = await fetch("http://localhost:8080/auth/login", {
+      const res = await fetch(`${API_BASE_URL}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(loginData),
+        body: JSON.stringify({ email: email.trim(), password }),
       });
 
-      if (res.ok) {
-        const data = await res.json();
-        const storage = rememberMe ? localStorage : sessionStorage;
-        storage.setItem("jwtToken", data.token);
-        storage.setItem("userId", data.userId);
-        storage.setItem("userRole", data.role);
-        storage.setItem("firstName", data.firstName);
-        storage.setItem("lastName", data.lastName);
-
-        // redirect function placeholder
-        window.location.href = "/"; 
-      } else {
-        const errorData = await res.json();
-        setError(errorData.message || "Fel e-post eller lösenord");
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.message || "Fel e-post eller lösenord");
       }
+
+      const data = await res.json();
+      login(
+        {
+          token: data.token,
+          role: data.role,
+          firstName: data.firstName ?? "",
+          lastName: data.lastName ?? "",
+        },
+        rememberMe
+      );
+
+      router.replace(data.role === "ADMIN" ? "/admin/dashboard" : "/");
     } catch (err) {
       console.error(err);
-      setError("Ett tekniskt fel uppstod. Försök igen senare.");
+      setError(err.message || "Ett tekniskt fel uppstod. Försök igen senare.");
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -59,7 +70,8 @@ export default function LoginForm() {
         {/* E-post */}
         <div className="col-12">
           <label htmlFor="email" className="form-label">
-            <i className="bi bi-envelope"></i> E-postadress <span className="required">*</span>
+            <i className="bi bi-envelope"></i> E-postadress{" "}
+            <span className="required">*</span>
           </label>
           <input
             type="email"
@@ -75,7 +87,8 @@ export default function LoginForm() {
         {/* Lösenord */}
         <div className="col-12">
           <label htmlFor="password" className="form-label">
-            <i className="bi bi-lock"></i> Lösenord <span className="required">*</span>
+            <i className="bi bi-lock"></i> Lösenord{" "}
+            <span className="required">*</span>
           </label>
           <input
             type="password"
@@ -103,14 +116,29 @@ export default function LoginForm() {
                 Kom ihåg mig
               </label>
             </div>
-            <a href="#" className="link-primary">Glömt lösenord?</a>
+            <a href="#" className="link-primary">
+              Glömt lösenord?
+            </a>
           </div>
         </div>
 
         {/* Submit button */}
         <div className="col-12 mt-4">
-          <button type="submit" className="btn-auth-submit">
-            <i className="bi bi-box-arrow-in-right"></i> Logga in
+          <button
+            type="submit"
+            className="btn-auth-submit"
+            disabled={submitting}
+          >
+            {submitting ? (
+              <>
+                <span className="spinner-border spinner-border-sm me-2" />
+                Loggar in...
+              </>
+            ) : (
+              <>
+                <i className="bi bi-box-arrow-in-right"></i> Logga in
+              </>
+            )}
           </button>
         </div>
       </div>

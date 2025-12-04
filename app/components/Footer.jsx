@@ -1,8 +1,13 @@
 "use client";
-import "bootstrap/dist/js/bootstrap.bundle.min.js";
+
+import { useEffect } from "react";
 import Link from "next/link";
 
 export default function Footer() {
+  useEffect(() => {
+    import("bootstrap/dist/js/bootstrap.bundle.min.js");
+  }, []);
+
   return (
     <footer className="footer">
       <div className="container">

@@ -1,7 +1,10 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import CarCard from "./Car";
-import { useState, useEffect } from "react";
+
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
 
 export default function Cars() {
   const [cars, setCars] = useState([]);
@@ -10,7 +13,7 @@ export default function Cars() {
     let mounted = true;
     const fetchCars = async () => {
       try {
-        const res = await fetch("http://localhost:8080/cars");
+        const res = await fetch(`${API_BASE_URL}/cars`);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const carsList = await res.json();
         if (mounted) setCars(carsList);
